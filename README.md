@@ -26,11 +26,9 @@ dirt-batch-root-analysis/
 ├── images/
 │   └── *.JPG
 ├── results/
-├── traits.csv
 ├── scripts/
 │   └── run_dirt_batch.sh
 ├── README.md
-└── LICENSE
 ```
 
 ---
@@ -73,7 +71,7 @@ This only needs to be done once.
 Clone this repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dirt-batch.git
+git clone https://github.com/EhtishamSK/Pheno-Roots.git
 cd dirt-batch-root-analysis
 ```
 
@@ -117,7 +115,6 @@ The script will automatically:
 2. Create a dedicated results folder for each image.
 3. Launch the DIRT Docker container.
 4. Extract root traits.
-5. Append measurements to `traits.csv`.
 
 ---
 
