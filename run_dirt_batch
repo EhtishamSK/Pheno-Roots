@@ -1,0 +1,58 @@
+#!/bin/bash
+# =============================================================================
+# DIRT Batch Processor for Chile Pepper Root Images
+# Uses computationalplantscience/dirt Docker image
+# =============================================================================
+
+set -euo pipefail  # Better error handling
+
+# Configuration
+BASE_DIR="${1:-$PWD/..}"           # Allow passing base dir as argument
+IMAGE_DIR="$BASE_DIR/images"
+RESULTS_DIR="$BASE_DIR/results"
+TRAITS_CSV="$BASE_DIR/traits.csv"
+
+# Create directories
+mkdir -p "$RESULTS_DIR"
+
+echo "=== DIRT Batch Processing Started ==="
+echo "Image directory : $IMAGE_DIR"
+echo "Results directory: $RESULTS_DIR"
+echo "====================================="
+
+shopt -s nullglob  # Handle case with no images gracefully
+for IMAGEPATH in "$IMAGE_DIR"/*.JPG "$IMAGE_DIR"/*.jpg; do
+    [[ -e "$IMAGEPATH" ]] || { echo "No JPG images found in $IMAGE_DIR"; exit 1; }
+    
+    IMAGE=$(basename "$IMAGEPATH")
+    NAME="${IMAGE%.*}"   # Remove any extension
+
+    echo "Processing: $IMAGE → $NAME"
+
+    RESULT_DIR="$RESULTS_DIR/$NAME"
+    mkdir -p "$RESULT_DIR/1" "$RESULT_DIR/Mask" "$RESULT_DIR/Crown" "$RESULT_DIR/Lateral"
+
+    # Fix permissions (in case of previous sudo runs)
+    chown -R "$(id -u):$(id -g)" "$RESULT_DIR" 2>/dev/null || true
+
+    docker run --rm \
+        -u "$(id -u):$(id -g)" \
+        -v "$BASE_DIR:/data" \
+        -w /data \
+        computationalplantscience/dirt:latest \
+        bash -c "
+            export HOME=/data &&
+            cd /data &&
+            python3 /opt/DIRT/main.py \
+                \"/data/images/${IMAGE}\" \
+                1 1.0 1 1 1 25.4 0 0 0 \
+                \"/data/results/${NAME}\" \
+                \"/data/traits.csv\"
+        "
+
+    echo "✓ Completed: $NAME"
+done
+
+echo "====================================="
+echo "ALL PROCESSING COMPLETED!"
+echo "Results available in: $RESULTS_DIR"
