@@ -179,7 +179,7 @@ results/      # Image-specific DIRT outputs
 
 ### Input Image (Raw Root System)
 
-<img src="raw_image.png" width="450">
+<img src="raw_image.JPG" width="450">
 
 This is the raw root image prepared for DIRT analysis (clean background, clearly visible root architecture).
 
